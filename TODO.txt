@@ -1,0 +1,13 @@
+TODO:front, back 複数のリポジトリを見る
+まずは保存部分をつくる。
+保存するディレクトリパスを取得する。
+保存先も決められる。そこに現在時刻で保存していく。
+
+type Repository = {
+  name: string;
+  sourcePath: string;
+  deployPath: string;
+  savePath: string;
+}
+
+saveを行う。
