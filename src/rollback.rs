@@ -50,6 +50,7 @@ pub fn rollback(config_path: &str) {
         .choices(
             saved_vec
                 .iter()
+                .rev()
                 .map(|path| path.file_name().unwrap().to_str().unwrap().to_string())
                 .collect::<Vec<String>>(),
         )
