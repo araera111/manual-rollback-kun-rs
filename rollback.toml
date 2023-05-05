@@ -3,9 +3,3 @@ deploy_path = "a"
 name = "a"
 save_path = "a"
 source_path = "a"
-
-[[sources]]
-deploy_path = "a"
-name = "a"
-save_path = "a"
-source_path = "a"

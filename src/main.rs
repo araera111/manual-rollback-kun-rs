@@ -1,6 +1,7 @@
 mod add;
 mod delete;
 mod read_config;
+mod rollback;
 mod save;
 mod util;
 
@@ -30,7 +31,8 @@ pub struct ConfigPathArgs {
 enum Commands {
     #[command(name = "save")]
     Save(ConfigPathArgs),
-    Rollback {},
+    #[command(name = "rollback")]
+    Rollback(ConfigPathArgs),
     #[command(name = "add")]
     Add(ConfigPathArgs),
     #[command(name = "delete")]
@@ -47,8 +49,9 @@ fn main() {
                 save::save_old_data(source);
             });
         }
-        Some(Commands::Rollback {}) => {
-            println!("rollback")
+        Some(Commands::Rollback(config_path)) => {
+            let config_path = util::get_config_path(&config_path);
+            rollback::rollback(&config_path);
         }
         Some(Commands::Add(config_path)) => {
             let config_path = util::get_config_path(&config_path);
