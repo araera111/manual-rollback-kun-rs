@@ -36,7 +36,7 @@ fn make_config_from_questions() -> read_config::Config {
         get_answer_string(requestty::prompt_one(question_project_name).unwrap());
 
     let question_source_path = make_input_question(
-        "What is the path to the project to be saved?",
+        "Where is the source directory of the project?",
         "Please enter the project's source path",
     );
 
@@ -58,11 +58,33 @@ fn make_config_from_questions() -> read_config::Config {
 
     let answer_save_path = get_answer_string(requestty::prompt_one(question_save_path).unwrap());
 
+    let question_after_deploy_command = requestty::Question::input("")
+        .message("What is the command to run after deployment?")
+        .build();
+
+    let answer_after_deploy_command = requestty::prompt_one(question_after_deploy_command)
+        .unwrap()
+        .as_string()
+        .unwrap()
+        .to_string();
+
+    let is_save_before_deploy = requestty::Question::confirm("")
+        .message("Do you want to save the project before deployment?")
+        .default(true)
+        .build();
+
+    let answer_save_before_deploy = requestty::prompt_one(is_save_before_deploy)
+        .unwrap()
+        .as_bool()
+        .unwrap();
+
     let source = read_config::Source {
         deploy_path: answer_deploy_path,
         name: answer_project_name,
         save_path: answer_save_path,
         source_path: answer_source_path,
+        deploy_command: answer_after_deploy_command,
+        is_save_before_deploy: answer_save_before_deploy,
     };
     println!("{:?}", source);
 

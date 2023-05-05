@@ -1,27 +1,19 @@
-use crate::read_config;
+use crate::{
+    read_config,
+    util::{error_stderr, select_config},
+};
 
 pub fn delete_config_to_toml(config_path: &str) {
     let config: read_config::Config = read_config::read_config(&config_path);
 
-    let config_names = config
-        .sources
-        .iter()
-        .map(|source| source.name.clone())
-        .collect::<Vec<String>>();
+    let answer_string = select_config(&config, "Which config do you want to delete?");
 
-    /* config_namesが空のときはエラーを表示し、終了する。 */
-    if config_names.is_empty() {
-        println!("There are no config files to delete.");
-        std::process::exit(1);
+    if answer_string.is_err() {
+        error_stderr(answer_string.unwrap_err());
+        return;
     }
 
-    let question = requestty::Question::select("overwrite")
-        .message("Conflict on `file.rs`")
-        .choices(config_names)
-        .build();
-
-    let answer = requestty::prompt_one(question).unwrap();
-    let answer_string = &answer.as_list_item().unwrap().text;
+    let answer_string = answer_string.unwrap();
 
     println!("{}", answer_string);
 
