@@ -9,6 +9,10 @@ pub struct Source {
     pub name: String,
     pub save_path: String,
     pub source_path: String,
+    /* deploy後のcommand. optionのstring */
+    pub deploy_command: String,
+    /* deploy前にsaveするかどうか。optionのboolean */
+    pub is_save_before_deploy: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

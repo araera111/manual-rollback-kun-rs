@@ -1,11 +1,13 @@
 mod add;
 mod delete;
+mod deploy;
 mod read_config;
 mod rollback;
 mod save;
 mod util;
 
 use clap::{Parser, Subcommand};
+
 /*
     -c --config -> config.tomlを定義する。
 */
@@ -37,6 +39,8 @@ enum Commands {
     Add(ConfigPathArgs),
     #[command(name = "delete")]
     Delete(ConfigPathArgs),
+    #[command(name = "deploy")]
+    Deploy(ConfigPathArgs),
 }
 
 fn main() {
@@ -45,9 +49,7 @@ fn main() {
         Some(Commands::Save(config_path)) => {
             let config_path = util::get_config_path(&config_path);
             let config: read_config::Config = read_config::read_config(&config_path);
-            config.sources.iter().for_each(|source| {
-                save::save_old_data(source);
-            });
+            save::save_old_data(&config);
         }
         Some(Commands::Rollback(config_path)) => {
             let config_path = util::get_config_path(&config_path);
@@ -60,6 +62,11 @@ fn main() {
         Some(Commands::Delete(config_path)) => {
             let config_path = util::get_config_path(&config_path);
             delete::delete_config_to_toml(&config_path);
+        }
+        Some(Commands::Deploy(config_path)) => {
+            let config_path = util::get_config_path(&config_path);
+            let config: read_config::Config = read_config::read_config(&config_path);
+            deploy::deploy(&config);
         }
         None => {
             println!("Please enter a command.");

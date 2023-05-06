@@ -27,6 +27,24 @@ fn get_answer_string(answer: requestty::Answer) -> String {
     answer.as_string().unwrap().to_string()
 }
 
+/* 絶対パスか相対パスかを判定する関数 */
+fn is_absolute_path(path: &str) -> bool {
+    Path::new(path).is_absolute()
+}
+
+/* 相対パスであれば絶対パスに変換する関数 */
+fn convert_to_absolute_path(path: &str) -> String {
+    if !is_absolute_path(path) {
+        return path.to_string();
+    }
+    let current_dir = std::env::current_dir().unwrap();
+    let current_dir = current_dir.to_str().unwrap();
+    /* pathのjoinを使って2つのdirをpathにする */
+    let path = Path::new(current_dir).join(path);
+    let path = path.to_str().unwrap().to_string();
+    path
+}
+
 fn make_config_from_questions() -> read_config::Config {
     let question_project_name = make_input_question(
         "What is the name of the project to be saved?",
@@ -36,33 +54,59 @@ fn make_config_from_questions() -> read_config::Config {
         get_answer_string(requestty::prompt_one(question_project_name).unwrap());
 
     let question_source_path = make_input_question(
-        "What is the path to the project to be saved?",
+        "Where is the source directory of the project?",
         "Please enter the project's source path",
     );
 
-    let answer_source_path =
-        get_answer_string(requestty::prompt_one(question_source_path).unwrap());
+    let answer_source_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_source_path).unwrap(),
+    ));
 
     let question_deploy_path = make_input_question(
         "What is the path to the project to be deployed?",
         "Please enter the project's deploy path.",
     );
 
-    let answer_deploy_path =
-        get_answer_string(requestty::prompt_one(question_deploy_path).unwrap());
+    let answer_deploy_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_deploy_path).unwrap(),
+    ));
 
     let question_save_path = make_input_question(
         "What is the path to the project to be saved?",
         "Please enter the project's save path.",
     );
 
-    let answer_save_path = get_answer_string(requestty::prompt_one(question_save_path).unwrap());
+    let answer_save_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_save_path).unwrap(),
+    ));
+
+    let question_after_deploy_command = requestty::Question::input("")
+        .message("What is the command to run after deployment?")
+        .build();
+
+    let answer_after_deploy_command = requestty::prompt_one(question_after_deploy_command)
+        .unwrap()
+        .as_string()
+        .unwrap()
+        .to_string();
+
+    let is_save_before_deploy = requestty::Question::confirm("")
+        .message("Do you want to save the project before deployment?")
+        .default(true)
+        .build();
+
+    let answer_save_before_deploy = requestty::prompt_one(is_save_before_deploy)
+        .unwrap()
+        .as_bool()
+        .unwrap();
 
     let source = read_config::Source {
         deploy_path: answer_deploy_path,
         name: answer_project_name,
         save_path: answer_save_path,
         source_path: answer_source_path,
+        deploy_command: answer_after_deploy_command,
+        is_save_before_deploy: answer_save_before_deploy,
     };
     println!("{:?}", source);
 
