@@ -57,7 +57,7 @@ pub fn deploy(config: &Config) {
     /* is_save_before_deployがtrueのときは保存する */
     let is_save_before_deploy = deploy_source.is_save_before_deploy;
     if is_save_before_deploy {
-        save::save_old_data(deploy_source);
+        save::save_source(deploy_source);
     }
 
     /* deployする */

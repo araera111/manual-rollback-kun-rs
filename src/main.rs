@@ -49,9 +49,7 @@ fn main() {
         Some(Commands::Save(config_path)) => {
             let config_path = util::get_config_path(&config_path);
             let config: read_config::Config = read_config::read_config(&config_path);
-            config.sources.iter().for_each(|source| {
-                save::save_old_data(source);
-            });
+            save::save_old_data(&config);
         }
         Some(Commands::Rollback(config_path)) => {
             let config_path = util::get_config_path(&config_path);
