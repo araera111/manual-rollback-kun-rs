@@ -39,7 +39,10 @@ fn convert_to_absolute_path(path: &str) -> String {
     }
     let current_dir = std::env::current_dir().unwrap();
     let current_dir = current_dir.to_str().unwrap();
-    format!("{}/{}", current_dir, path)
+    /* pathのjoinを使って2つのdirをpathにする */
+    let path = Path::new(current_dir).join(path);
+    let path = path.to_str().unwrap().to_string();
+    path
 }
 
 fn make_config_from_questions() -> read_config::Config {
