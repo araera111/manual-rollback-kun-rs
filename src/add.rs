@@ -27,6 +27,21 @@ fn get_answer_string(answer: requestty::Answer) -> String {
     answer.as_string().unwrap().to_string()
 }
 
+/* 絶対パスか相対パスかを判定する関数 */
+fn is_absolute_path(path: &str) -> bool {
+    Path::new(path).is_absolute()
+}
+
+/* 相対パスであれば絶対パスに変換する関数 */
+fn convert_to_absolute_path(path: &str) -> String {
+    if !is_absolute_path(path) {
+        return path.to_string();
+    }
+    let current_dir = std::env::current_dir().unwrap();
+    let current_dir = current_dir.to_str().unwrap();
+    format!("{}/{}", current_dir, path)
+}
+
 fn make_config_from_questions() -> read_config::Config {
     let question_project_name = make_input_question(
         "What is the name of the project to be saved?",
@@ -40,23 +55,27 @@ fn make_config_from_questions() -> read_config::Config {
         "Please enter the project's source path",
     );
 
-    let answer_source_path =
-        get_answer_string(requestty::prompt_one(question_source_path).unwrap());
+    let answer_source_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_source_path).unwrap(),
+    ));
 
     let question_deploy_path = make_input_question(
         "What is the path to the project to be deployed?",
         "Please enter the project's deploy path.",
     );
 
-    let answer_deploy_path =
-        get_answer_string(requestty::prompt_one(question_deploy_path).unwrap());
+    let answer_deploy_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_deploy_path).unwrap(),
+    ));
 
     let question_save_path = make_input_question(
         "What is the path to the project to be saved?",
         "Please enter the project's save path.",
     );
 
-    let answer_save_path = get_answer_string(requestty::prompt_one(question_save_path).unwrap());
+    let answer_save_path = convert_to_absolute_path(&get_answer_string(
+        requestty::prompt_one(question_save_path).unwrap(),
+    ));
 
     let question_after_deploy_command = requestty::Question::input("")
         .message("What is the command to run after deployment?")
